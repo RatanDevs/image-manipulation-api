@@ -10,6 +10,7 @@ export default function Playground({ apiUrl }) {
   const [height, setHeight] = useState('');
   const [quality, setQuality] = useState(80);
   const [crop, setCrop] = useState(false);
+  const [format, setFormat] = useState('original'); // New State
   const [generatedUrl, setGeneratedUrl] = useState('');
   const [previewState, setPreviewState] = useState('idle'); // 'idle' | 'loading' | 'success' | 'error'
   const [copied, setCopied] = useState(false);
@@ -28,6 +29,7 @@ export default function Playground({ apiUrl }) {
     if (height) params.append('h', height);
     if (crop) params.append('crop', '1');
     if (quality !== 80) params.append('q', quality.toString());
+    if (format && format !== 'original') params.append('format', format); // Append Format parameter
 
     const finalUrl = `${apiUrl}?${params.toString()}`;
     setGeneratedUrl(finalUrl);
@@ -130,6 +132,18 @@ export default function Playground({ apiUrl }) {
                         <input type="number" min="0" placeholder="e.g., 400" value={height} onChange={(e) => setHeight(e.target.value)}
                           class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
                       </div>
+                    </div>
+
+                    {/* Output Format Dropdown */}
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-600 mb-1.5">Output Format</label>
+                      <select value={format} onChange={(e) => setFormat(e.target.value)}
+                        class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-slate-700">
+                        <option value="original">Original (Match Source)</option>
+                        <option value="webp">WebP (Recommended)</option>
+                        <option value="jpeg">JPEG (Standard)</option>
+                        <option value="png">PNG (Lossless)</option>
+                      </select>
                     </div>
 
                     <div>
@@ -275,6 +289,13 @@ export default function Playground({ apiUrl }) {
                     <td class="py-4 px-6 text-slate-400 font-medium">No</td>
                     <td class="py-4 px-6 text-slate-500">Compression scale value between <code class="bg-slate-50 text-indigo-600 border border-slate-100 px-1 py-0.5 rounded">1</code> (lowest quality, highest compression) and <code class="bg-slate-50 text-indigo-600 border border-slate-100 px-1 py-0.5 rounded">100</code>. Default is 80.</td>
                   </tr>
+                  {/* New Parameter Entry */}
+                  <tr>
+                    <td class="py-4 px-6 font-mono font-semibold text-slate-900">format</td>
+                    <td class="py-4 px-6 text-indigo-600 font-semibold">string</td>
+                    <td class="py-4 px-6 text-slate-400 font-medium">No</td>
+                    <td class="py-4 px-6 text-slate-500">Converts image output format. Acceptable inputs: <code class="bg-slate-50 text-indigo-600 border border-slate-100 px-1 py-0.5 rounded">original</code>, <code class="bg-slate-50 text-indigo-600 border border-slate-100 px-1 py-0.5 rounded">webp</code>, <code class="bg-slate-50 text-indigo-600 border border-slate-100 px-1 py-0.5 rounded">jpeg</code> (or <code class="bg-slate-50 text-indigo-600 border border-slate-100 px-1 py-0.5 rounded">jpg</code>), and <code class="bg-slate-50 text-indigo-600 border border-slate-100 px-1 py-0.5 rounded">png</code>. Default is <code class="bg-slate-50 text-indigo-600 border border-slate-100 px-1 py-0.5 rounded">original</code>.</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -286,7 +307,7 @@ export default function Playground({ apiUrl }) {
             <span class="text-slate-400">&lt;!-- Example of integrating directly into web content --&gt;</span>
             <br />
             <span class="text-pink-400">&lt;img</span> 
-            <span class="text-purple-400">src=</span><span class="text-emerald-400">"{apiUrl}?src=https://unsplash.com/sample.jpg&w=400&h=300&crop=1"</span> 
+            <span class="text-purple-400">src=</span><span class="text-emerald-400">"{apiUrl}?src=https://unsplash.com/sample.jpg&w=400&h=300&crop=1&format=webp"</span> 
             <span class="text-purple-400">alt=</span><span class="text-emerald-400">"Cropped Thumbnail"</span>
             <span class="text-purple-400">loading=</span><span class="text-emerald-400">"lazy"</span><span class="text-pink-400">&gt;</span>
           </div>

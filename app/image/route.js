@@ -8,6 +8,9 @@ export async function GET(request) {
   const h = searchParams.get('h') ? parseInt(searchParams.get('h'), 10) : null;
   const crop = searchParams.get('crop') === '1';
   const q = searchParams.get('q') ? Math.max(1, Math.min(100, parseInt(searchParams.get('q'), 10))) : 80;
+  
+  // Retrieve format parameter, default to 'original'
+  const format = searchParams.get('format') ? searchParams.get('format').toLowerCase() : 'original';
 
   if (!src) {
     return new NextResponse("Error: 'src' parameter is required.", { status: 400 });
@@ -30,7 +33,7 @@ export async function GET(request) {
     // 3. Dynamic Resizing & Aspect Ratio Logic
     if (w || h) {
       const resizeOptions = {
-        fit: crop ? 'cover' : 'inside' // cover = crop center, inside = scale proportionally (contain)
+        fit: crop ? 'cover' : 'inside' // cover = crop center, inside = scale proportionally
       };
       if (w) resizeOptions.width = w;
       if (h) resizeOptions.height = h;
@@ -38,31 +41,39 @@ export async function GET(request) {
       pipeline = pipeline.resize(resizeOptions);
     }
 
-    // 4. Format Detection and Quality Mapping
-    let contentType = 'image/webp';
-    const format = metadata.format;
+    // 4. Format Conversion Mapping
+    let targetFormat = format;
+    if (targetFormat === 'jpg') targetFormat = 'jpeg'; // Normalize
 
-    if (format === 'jpeg' || format === 'jpg') {
+    const originalFormat = metadata.format; // e.g., 'png', 'jpeg', 'webp'
+
+    if (targetFormat === 'original') {
+      targetFormat = originalFormat;
+    }
+
+    // Fallback logic for unsupported format queries
+    const allowedFormats = ['jpeg', 'png', 'webp'];
+    if (!allowedFormats.includes(targetFormat)) {
+      targetFormat = 'webp'; // Safest fallback format
+    }
+
+    let contentType = `image/${targetFormat}`;
+
+    // 5. Apply Format Transformation & Compression
+    if (targetFormat === 'jpeg') {
       pipeline = pipeline.jpeg({ quality: q, mozjpeg: true });
-      contentType = 'image/jpeg';
-    } else if (format === 'png') {
+    } else if (targetFormat === 'png') {
       pipeline = pipeline.png({ quality: q });
-      contentType = 'image/png';
-    } else if (format === 'webp') {
-      pipeline = pipeline.webp({ quality: q });
-      contentType = 'image/webp';
-    } else {
-      // Fallback format
+    } else if (targetFormat === 'webp') {
       pipeline = pipeline.webp({ quality: q });
     }
 
     const outputBuffer = await pipeline.toBuffer();
 
-    // 5. Output binary with Edge Caching headers
+    // 6. Output binary payload with Vercel Edge CDN Caching
     return new NextResponse(outputBuffer, {
       headers: {
         'Content-Type': contentType,
-        // Cache the processed image on Vercel CDN nodes for 1 year
         'Cache-Control': 'public, max-age=31536000, must-revalidate',
       },
     });
