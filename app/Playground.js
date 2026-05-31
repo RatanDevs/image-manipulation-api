@@ -16,7 +16,7 @@ export default function Playground({ apiUrl }) {
   const [copied, setCopied] = useState(false);
 
   const loadDemoImage = () => {
-    setSrcUrl("https://images.unsplash.com/photo-1541701494587-cb58502866ab");
+    setSrcUrl("https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1500");
   };
 
   const generateImage = () => {
@@ -29,7 +29,7 @@ export default function Playground({ apiUrl }) {
     if (height) params.append('h', height);
     if (crop) params.append('crop', '1');
     if (quality !== 80) params.append('q', quality.toString());
-    if (format && format !== 'original') params.append('format', format); // Append Format parameter
+    if (format && format !== 'original') params.append('format', format);
 
     const finalUrl = `${apiUrl}?${params.toString()}`;
     setGeneratedUrl(finalUrl);
@@ -104,7 +104,7 @@ export default function Playground({ apiUrl }) {
                 <label for="img-url" class="block text-sm font-semibold text-slate-700 mb-2">Source Image URL</label>
                 <div class="relative">
                   <input type="url" id="img-url" required value={srcUrl} onChange={(e) => setSrcUrl(e.target.value)}
-                    placeholder="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5"
+                    placeholder="https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1500"
                     class="w-full pl-4 pr-16 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm text-slate-800"
                   />
                   <button type="button" onClick={loadDemoImage} class="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-2.5 py-1.5 rounded-lg">Demo</button>
@@ -134,7 +134,6 @@ export default function Playground({ apiUrl }) {
                       </div>
                     </div>
 
-                    {/* Output Format Dropdown */}
                     <div>
                       <label class="block text-xs font-semibold text-slate-600 mb-1.5">Output Format</label>
                       <select value={format} onChange={(e) => setFormat(e.target.value)}
@@ -238,7 +237,7 @@ export default function Playground({ apiUrl }) {
         {/* API Documentation */}
         <section id="docs" class="border-t border-slate-200/60 pt-12 sm:pt-16 max-w-4xl mx-auto scroll-mt-24">
           <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-3">API Documentation</h2>
-          <p class="text-sm sm:text-base text-slate-500 mb-8">PicScale allows real-time manipulation of remote or local images using standard query string variables.</p>
+          <p class="text-sm sm:text-base text-slate-500 mb-8">PicScale allows real-time transformation of remote images using URL parameters.</p>
 
           <div class="bg-slate-900 text-slate-100 rounded-xl p-4 sm:p-5 mb-8 shadow-inner relative overflow-hidden">
             <div class="absolute right-0 top-0 bg-indigo-600/10 text-indigo-400 font-mono text-[9px] sm:text-[10px] uppercase font-bold px-3 py-1.5 rounded-bl-lg">Method: GET</div>
